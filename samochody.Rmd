@@ -17,12 +17,20 @@ if (!require(dplyr)) install.packages("dplyr")
 if (!require(naniar)) install.packages("naniar")
 if (!require(ggplot2)) install.packages("ggplot2")
 if (!require(VIM)) install.packages("VIM")
+if (!require(validate)) install.packages("validate")
+if (!require(validatetools)) install.packages("validatetools")
+if (!require(dcmodify)) install.packages("dcmodify")
+if (!require(errorlocate)) install.packages("errorlocate")
 
 library(tidyverse)
 library(dplyr)
 library(naniar)
 library(ggplot2)
 library(VIM)
+library(validate)
+library(validatetools)
+library(dcmodify)
+library(errorlocate)
 
 dane <- read_csv("dane/Car_Prices_Poland_Kaggle.csv")
 ```
@@ -43,10 +51,8 @@ Celem zbioru jest umożliwienie analizy cen, cech technicznych, profilu ofert i 
 2.  **Które cechy samochodów (np. rok produkcji, przebieg, moc silnika, rodzaj paliwa) mają największy wpływ na cenę pojazdu?**
 3.  **Jak zmieniają się ceny samochodów w zależności od roku produkcji? Czy starsze samochody tanieją liniowo czy nieliniowo?**
 4.  **Czy istnieją różnice w cenach samochodów w zależności od typu pojazdu (np. sedan, SUV, hatchback, kombi)?**
-5.  **Czy samochody używane różnią się istotnie ceną od samochodów nowych po uwzględnieniu innych cech pojazdu?**
-6.  **Jak przebieg pojazdu wpływa na jego cenę i czy wpływ ten różni się między markami?**
-7.  **Czy rodzaj paliwa (benzyna, diesel, LPG, hybryda, elektryczny) wpływa na cenę, a jeśli tak — które paliwo jest najdroższe na rynku wtórnym?**
-8.  **Jak lokalizacja oferty wpływa na cenę samochodu? Czy w dużych miastach auta są droższe niż w małych miejscowościach?**
+5.  **Jak przebieg pojazdu wpływa na jego cenę i czy wpływ ten różni się między markami?**
+6.  **Czy rodzaj paliwa (benzyna, diesel, LPG, hybryda, elektryczny) wpływa na cenę?**
 
 ## Analiza danych
 
@@ -64,9 +70,10 @@ procent <- prop_complete_var(dane) * 100
 
 W danych znajduje się `r procent` % kompletnych wartości.
 
-```{r}
-VIM::aggr(dane, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, labels=names(dane), cex.axis=.7, gap=3, ylab=c("Procent braków danych","Wzorzec braków danych"))
- 
+```{r message=FALSE, warning=FALSE}
+raport <- VIM::aggr(dane, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, labels=names(dane), cex.axis=.7, gap=3, ylab=c("Procent braków danych","Wzorzec braków danych"))
+
+raport$x
 ```
 
 ## Imputacje danych
@@ -79,3 +86,28 @@ VIM::aggr(dane_imp, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, labels
 Po imputacji danych za pomocą metody hotdeck, wszystkie braki danych zostały uzupełnione.
 
 ## 2.2 Walidacja danych
+
+## Reguły
+
+Rozpatrzmy następujący zbiór danych. Co widzisz w początkowych wierszach?
+
+```{r}
+data(dane_imp)
+head(dane_imp[3:7],3)
+# dodajmy ID
+dane_imp$rec_id <- sprintf("%03d",1:nrow(dane_imp))
+
+rules <- validator(
+  price >= 0
+  , year > 0 & year < 2026
+  , mileage >= 0
+  , fuel %in% c("Diesel", "CNG", "Gasoline", "Hybrid", "Electric", "LPG")
+)
+
+cf <- confront(dane_imp, rules, key="rec_id")
+summary(cf)
+barplot(cf, main="Samochody - Walidacja danych")
+#as.data.frame(cf) %>% head()
+```
+
+Wszystkie dane są poprawne zgodnie z ustalonymi regułami walidacji.
