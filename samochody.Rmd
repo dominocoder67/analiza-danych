@@ -43,3 +43,15 @@ Celem zbioru jest umożliwienie analizy cen, cech technicznych, profilu ofert i 
 8.  **Czy kolor samochodu ma wpływ na jego cenę? Jeśli tak, które kolory są wyceniane najwyżej?**
 9.  **Jak lokalizacja oferty wpływa na cenę samochodu? Czy w dużych miastach auta są droższe niż w małych miejscowościach?**
 10. **Które kombinacje cech (np. moc + przebieg, rok + pojemność silnika) najlepiej przewidują cenę samochodu?**
+
+## 2.1 Braki danych
+
+```{r}
+procent <- prop_complete_var(dane) * 100
+```
+
+W danych znajduje się `r procent` % kompletnych wartości.
+
+```{r}
+naniar::vis_miss(oceanbuoys)
+```
