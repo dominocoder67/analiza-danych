@@ -16,11 +16,13 @@ if (!require(tidyverse)) install.packages("tidyverse")
 if (!require(dplyr)) install.packages("dplyr")
 if (!require(naniar)) install.packages("naniar")
 if (!require(ggplot2)) install.packages("ggplot2")
+if (!require(VIM)) install.packages("VIM")
 
 library(tidyverse)
 library(dplyr)
 library(naniar)
 library(ggplot2)
+library(VIM)
 
 dane <- read_csv("dane/Car_Prices_Poland_Kaggle.csv")
 ```
@@ -59,6 +61,14 @@ procent <- prop_complete_var(dane) * 100
 W danych znajduje się `r procent` % kompletnych wartości.
 
 ```{r}
-naniar::vis_miss(oceanbuoys)
+VIM::aggr(dane, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, labels=names(dane), cex.axis=.7, gap=3, ylab=c("Procent braków danych","Wzorzec braków danych"))
+ 
 ```
 
+## Imputacje danych
+
+```{r}
+dane_imp <- hotdeck(dane)
+VIM::aggr(dane_imp, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, labels=names(dane_imp), cex.axis=.7, gap=3, ylab=c("Procent braków danych po imputacji","Wzorzec braków danych po imputacji"))
+```
+Po imputacji danych za pomocą metody hotdeck, wszystkie braki danych zostały uzupełnione.
