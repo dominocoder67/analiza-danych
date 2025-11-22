@@ -46,13 +46,17 @@ Celem zbioru jest umożliwienie analizy cen, cech technicznych, profilu ofert i 
 5.  **Czy samochody używane różnią się istotnie ceną od samochodów nowych po uwzględnieniu innych cech pojazdu?**
 6.  **Jak przebieg pojazdu wpływa na jego cenę i czy wpływ ten różni się między markami?**
 7.  **Czy rodzaj paliwa (benzyna, diesel, LPG, hybryda, elektryczny) wpływa na cenę, a jeśli tak — które paliwo jest najdroższe na rynku wtórnym?**
-8.  **Czy kolor samochodu ma wpływ na jego cenę? Jeśli tak, które kolory są wyceniane najwyżej?**
-9.  **Jak lokalizacja oferty wpływa na cenę samochodu? Czy w dużych miastach auta są droższe niż w małych miejscowościach?**
-10. **Które kombinacje cech (np. moc + przebieg, rok + pojemność silnika) najlepiej przewidują cenę samochodu?**
+8.  **Jak lokalizacja oferty wpływa na cenę samochodu? Czy w dużych miastach auta są droższe niż w małych miejscowościach?**
 
 ## Analiza danych
 
 ## 2.1 Braki danych
+
+Usunięcie kolumny ..1, ponieważ nie wpływa ona na analizę.
+
+```{r}
+dane %>% select(-"...1")
+```
 
 ```{r}
 procent <- prop_complete_var(dane) * 100
@@ -71,4 +75,7 @@ VIM::aggr(dane, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, labels=nam
 dane_imp <- hotdeck(dane)
 VIM::aggr(dane_imp, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, labels=names(dane_imp), cex.axis=.7, gap=3, ylab=c("Procent braków danych po imputacji","Wzorzec braków danych po imputacji"))
 ```
+
 Po imputacji danych za pomocą metody hotdeck, wszystkie braki danych zostały uzupełnione.
+
+## 2.2 Walidacja danych
