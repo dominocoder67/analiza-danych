@@ -15,21 +15,27 @@ knitr::opts_chunk$set(cache = TRUE)
 library(tidyverse)
 dane <- read_csv("dane/Car_Prices_Poland_Kaggle.csv")
 ```
+
 # Wstęp
 
 Celem niniejszego raportu jest analiza danych dotyczących cen samochodów w Polsce. Dane zostały pozyskane z platformy Kaggle i zawierają informacje na temat różnych modeli samochodów, ich cech oraz cen rynkowych. Analiza ma na celu zrozumienie czynników wpływających na ceny samochodów oraz identyfikację wzorców i trendów w danych.
 
 ## Opis danych
 
-W projekcie wykorzystujemy zbiór danych obejmujący 973 rekordy dotyczące członków siłowni. Każdy wpis zawiera zestaw informacji demograficznych, fizjologicznych oraz dotyczących nawyków treningowych. Dane pozwalają analizować zarówno podstawowe parametry zdrowotne, jak i bardziej zaawansowane wskaźniki wydajności.
+Zestaw danych pochodzi z jednego z największych portali ogłoszeniowych w Polsce. Zgromadzono w nim ponad 200 tysięcy ofert sprzedaży samochodów, obejmujących szeroki zakres marek, modeli, parametrów technicznych oraz informacji o stanie pojazdu.
+
+Celem zbioru jest umożliwienie analizy cen, cech technicznych, profilu ofert i trendów rynkowych dotyczących samochodów używanych i nowych dostępnych na polskim rynku.
 
 ### Pytania badawcze
 
-1.  **Jakie są średnie ceny samochodów w zależności od marki i modelu?**
-2.  **Jakie cechy samochodów (np. rok produkcji, przebieg, moc silnika) mają największy wpływ na ich cenę?**
-3.  **Jakie są trendy cenowe w zależności od roku produkcji samochodu?**
-4.  **Czy istnieją różnice w cenach samochodów w zależności od rodzaju?**
-
-
-
+1. **Jakie są średnie ceny samochodów w zależności od marki i modelu?**
+2. **Które cechy samochodów (np. rok produkcji, przebieg, moc silnika, rodzaj paliwa) mają największy wpływ na cenę pojazdu?**
+3. **Jak zmieniają się ceny samochodów w zależności od roku produkcji? Czy starsze samochody tanieją liniowo czy nieliniowo?**
+4. **Czy istnieją różnice w cenach samochodów w zależności od typu pojazdu (np. sedan, SUV, hatchback, kombi)?**
+5. **Czy samochody używane różnią się istotnie ceną od samochodów nowych po uwzględnieniu innych cech pojazdu?**
+6. **Jak przebieg pojazdu wpływa na jego cenę i czy wpływ ten różni się między markami?**
+7. **Czy rodzaj paliwa (benzyna, diesel, LPG, hybryda, elektryczny) wpływa na cenę, a jeśli tak — które paliwo jest najdroższe na rynku wtórnym?**
+8. **Czy kolor samochodu ma wpływ na jego cenę? Jeśli tak, które kolory są wyceniane najwyżej?**
+9. **Jak lokalizacja oferty wpływa na cenę samochodu? Czy w dużych miastach auta są droższe niż w małych miejscowościach?**
+10. **Które kombinacje cech (np. moc + przebieg, rok + pojemność silnika) najlepiej przewidują cenę samochodu?**
 
