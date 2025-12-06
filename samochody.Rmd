@@ -22,6 +22,7 @@ if (!require(validatetools)) install.packages("validatetools")
 if (!require(dcmodify)) install.packages("dcmodify")
 if (!require(errorlocate)) install.packages("errorlocate")
 if (!require(plotly)) install.packages("plotly")
+if (!require(modelsummary)) install.packages("modelsummary")
 
 library(tidyverse)
 library(dplyr)
@@ -33,6 +34,7 @@ library(validatetools)
 library(dcmodify)
 library(errorlocate)
 library(plotly)
+library(modelsummary)
 
 dane <- read_csv("dane/Car_Prices_Poland_Kaggle.csv")
 ```
@@ -89,7 +91,7 @@ Po imputacji danych za pomocą metody hotdeck, wszystkie braki danych zostały u
 
 ## 2.2 Walidacja danych
 
-## Reguły
+### Reguły
 
 Rozpatrzmy następujący zbiór danych. Co widzisz w początkowych wierszach?
 
@@ -113,3 +115,116 @@ barplot(cf, main="Samochody - Walidacja danych")
 ```
 
 Wszystkie dane są poprawne zgodnie z ustalonymi regułami walidacji.
+
+## 3 Wizualizacja Danych
+### 3.1 Analiza Diesel + Gasoline
+``` {r}
+wykres_przebieg_cena_diesel <- dane_imp %>%
+  filter(fuel %in% c("Diesel", "Gasoline")) %>%
+ggplot(aes(x = mileage, y = price)) +
+  geom_point() +
+  scale_x_log10() +
+  geom_smooth(method = "lm", color = "blue", se = FALSE) +
+  labs(title = "Zależność pomiędzy przbeiegiem a ceną",
+       x = "Przebieg (w tysiącach, log10)",
+       y = "Cena (w USD)") +
+  theme_minimal()
+wykres_przebieg_cena_diesel
+```
+
+Opis wykresu??????
+
+``` {r}
+wykres_rok_cena_diesel <- dane_imp %>%
+  filter(fuel %in% c("Diesel", "Gasoline")) %>%
+  ggplot(aes(x = year, y = price, color = mark)) +
+  geom_point() +
+  geom_smooth(method = "loess", color = "light green", se = FALSE) +
+  labs(title = "Zależność pomiędzy rokiem produkcji a ceną",
+       x = "Rok produkcji",
+       y = "Cena (w USD)") +
+  theme_minimal()
+plotly(wykres_rok_cena)
+```
+
+Opis wykresu??????
+
+### 3.2 Analiza Hybrid + Electric
+``` {r}
+wykres_przebieg_cena_EV <- dane_imp %>%
+  filter(fuel %in% c("Hybrid", "Electric")) %>%
+  ggplot(aes(x = mileage, y = price)) +
+  geom_point() +
+  scale_x_log10() +
+  geom_smooth(method = "lm", color = "red", se = FALSE) +
+  labs(title = "Zależność pomiędzy przbeiegiem a ceną",
+       x = "Przebieg (w tysiącach, log10)",
+       y = "Cena (w USD)") +
+  theme_minimal()
+wykres_przebieg_cena_EV
+```
+
+Opis wykresu?????
+
+``` {r}
+wykres_rok_cena_EV <- dane_imp %>%
+  filter(fuel %in% c("Hybrid", "Electric")) %>%
+  ggplot(aes(x = year, y = price, color = mark)) +
+  geom_point() +
+  geom_smooth(method = "loess", color = "light green", se = FALSE) +
+  labs(title = "Zależność pomiędzy rokiem produkcji a ceną",
+       x = "Rok produkcji",
+       y = "Cena (w USD)") +
+  theme_minimal()
+plotly(wykres_rok_cena)
+```
+
+Opis wykresu???
+
+Analiza statystyczna dla wpływu roku, przebiegu i mocy silnika na cene
+
+``` {r}
+LMP <- lm(price ~ year + mileage + vol_engine, data = dane_imp)
+summary(LMP)
+modelsummary(LMP)
+```
+Opis modelu 
+
+``` {r}
+tabela_najdrozsze_samochody <- dane_imp %>%
+  filter(year >= 2010) %>%
+  group_by(mark) %>%
+  summarise(srednia_cena = mean(price),
+            mediana_cena = median(price),
+            najdroższy = max(price),
+            najtańszy = min(price),
+            liczba_samochodow = n()) %>%
+  arrange(desc(srednia_cena))
+
+tabela_najdrozsze_samochody
+```
+
+Wybieramy marki samochodów z najwyższą średnią ceną i analizujemy zmiane ceny w przeciągu lat.
+
+``` {r}
+wykres_srednia_cena_przez_lata <- dane_imp %>% 
+  filter(mark %in% c("mercedes", "bmw", "audi", "volvo", "alfa-romeo")) %>%
+  group_by(mark, year) %>%
+  summarise(srednia_cena = mean(price)) %>%
+  ggplot(aes(x = year, y = srednia_cena, color = mark)) +
+  geom_line()
+plotly(wykres_srednia_cena_przez_lata)
+```
+
+Opis wykresu????
+
+``` {r}
+wykres_rejestracje <- dane_imp %>%
+  filter(year >= 1990) %>%
+  group_by(mark, year) %>%
+  summarise(liczba_aut_rok = n()) %>%
+  ggplot(aes(x = year, y = liczba_aut_rok, color = mark)) +
+  geom_line()
+plotly(wykres_rejestracje)
+```
+Opis wykresu???
