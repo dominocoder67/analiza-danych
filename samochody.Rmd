@@ -21,6 +21,7 @@ if (!require(validate)) install.packages("validate")
 if (!require(validatetools)) install.packages("validatetools")
 if (!require(dcmodify)) install.packages("dcmodify")
 if (!require(errorlocate)) install.packages("errorlocate")
+if (!require(plotly)) install.packages("plotly")
 
 library(tidyverse)
 library(dplyr)
@@ -31,6 +32,7 @@ library(validate)
 library(validatetools)
 library(dcmodify)
 library(errorlocate)
+library(plotly)
 
 dane <- read_csv("dane/Car_Prices_Poland_Kaggle.csv")
 ```
