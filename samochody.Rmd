@@ -47,7 +47,7 @@ Celem zbioru jest umożliwienie analizy cen, cech technicznych, profilu ofert i 
 
 ### Pytania badawcze
 
-1.  **Jakie są średnie ceny samochodów w zależności od marki i modelu?**
+1.  **Jakie są średnie ceny samochodów w zależności od marki?**
 2.  **Które cechy samochodów (np. rok produkcji, przebieg, moc silnika, rodzaj paliwa) mają największy wpływ na cenę pojazdu?**
 3.  **Jak zmieniają się ceny samochodów w zależności od roku produkcji? Czy starsze samochody tanieją liniowo czy nieliniowo?**
 4.  **Czy istnieją różnice w cenach samochodów w zależności od typu pojazdu (np. sedan, SUV, hatchback, kombi)?**
