@@ -31,7 +31,7 @@ wykres_rok_cena_diesel <- dane_imp %>%
        x = "Rok produkcji",
        y = "Cena (w USD)") +
   theme_minimal()
-plotly(wykres_rok_cena)
+plotly(wykres_rok_cena_diesel)
 
 wykres_rok_cena_EV <- dane_imp %>%
   filter(fuel %in% c("Hybrid", "Electric")) %>%
@@ -77,3 +77,12 @@ wykres_rejestracje <- dane_imp %>%
   ggplot(aes(x = year, y = liczba_aut_rok, color = mark)) +
   geom_line()
 plotly(wykres_rejestracje)
+
+wykres_srednia_cena_fuel <- dane_imp %>% 
+  # filter(mark %in% c("mercedes", "bmw", "audi", "volvo", "alfa-romeo")) %>%
+  group_by(fuel, year) %>%
+  summarise(srednia_cena = mean(price)) %>%
+  ggplot(aes(x = year, y = srednia_cena, color = fuel)) +
+  geom_line()
+wykres_srednia_cena_fuel
+plotly(wykres_srednia_cena_fuel)

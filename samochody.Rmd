@@ -144,7 +144,7 @@ wykres_rok_cena_diesel <- dane_imp %>%
        x = "Rok produkcji",
        y = "Cena (w USD)") +
   theme_minimal()
-plotly(wykres_rok_cena)
+plotly(wykres_rok_cena_diesel)
 ```
 
 Opis wykresu??????
@@ -180,6 +180,8 @@ plotly(wykres_rok_cena)
 ```
 
 Opis wykresu???
+
+### 3.3 Analiza ogólna cen i czynników wpływających na cene
 
 Analiza statystyczna dla wpływu roku, przebiegu i mocy silnika na cene
 
@@ -228,3 +230,14 @@ wykres_rejestracje <- dane_imp %>%
 plotly(wykres_rejestracje)
 ```
 Opis wykresu???
+
+``` {r}
+wykres_srednia_cena_fuel <- dane_imp %>% 
+  # filter(mark %in% c("mercedes", "bmw", "audi", "volvo", "alfa-romeo")) %>%
+  group_by(fuel, year) %>%
+  summarise(srednia_cena = mean(price)) %>%
+  ggplot(aes(x = year, y = srednia_cena, color = fuel)) +
+  geom_line()
+wykres_srednia_cena_fuel
+plotly(wykres_srednia_cena_fuel)
+```
