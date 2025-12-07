@@ -117,11 +117,13 @@ barplot(cf, main="Samochody - Walidacja danych")
 Wszystkie dane są poprawne zgodnie z ustalonymi regułami walidacji.
 
 ## 3 Wizualizacja Danych
+
 ### 3.1 Analiza Diesel + Gasoline
-``` {r}
+
+```{r}
 wykres_przebieg_cena_diesel <- dane_imp %>%
   filter(fuel %in% c("Diesel", "Gasoline")) %>%
-ggplot(aes(x = mileage, y = price)) +
+ggplot(aes(x = mileage, y = price, color = "mark")) +
   geom_point() +
   scale_x_log10() +
   geom_smooth(method = "lm", color = "blue", se = FALSE) +
@@ -129,12 +131,12 @@ ggplot(aes(x = mileage, y = price)) +
        x = "Przebieg (w tysiącach, log10)",
        y = "Cena (w USD)") +
   theme_minimal()
-wykres_przebieg_cena_diesel
+ggplotly(wykres_przebieg_cena_diesel)
 ```
 
 Opis wykresu??????
 
-``` {r}
+```{r}
 wykres_rok_cena_diesel <- dane_imp %>%
   filter(fuel %in% c("Diesel", "Gasoline")) %>%
   ggplot(aes(x = year, y = price, color = mark)) +
@@ -144,16 +146,17 @@ wykres_rok_cena_diesel <- dane_imp %>%
        x = "Rok produkcji",
        y = "Cena (w USD)") +
   theme_minimal()
-plotly(wykres_rok_cena_diesel)
+ggplotly(wykres_rok_cena_diesel)
 ```
 
 Opis wykresu??????
 
 ### 3.2 Analiza Hybrid + Electric
-``` {r}
+
+```{r}
 wykres_przebieg_cena_EV <- dane_imp %>%
   filter(fuel %in% c("Hybrid", "Electric")) %>%
-  ggplot(aes(x = mileage, y = price)) +
+  ggplot(aes(x = mileage, y = price, color = "mark")) +
   geom_point() +
   scale_x_log10() +
   geom_smooth(method = "lm", color = "red", se = FALSE) +
@@ -161,12 +164,12 @@ wykres_przebieg_cena_EV <- dane_imp %>%
        x = "Przebieg (w tysiącach, log10)",
        y = "Cena (w USD)") +
   theme_minimal()
-wykres_przebieg_cena_EV
+ggplotly(wykres_przebieg_cena_EV)
 ```
 
 Opis wykresu?????
 
-``` {r}
+```{r}
 wykres_rok_cena_EV <- dane_imp %>%
   filter(fuel %in% c("Hybrid", "Electric")) %>%
   ggplot(aes(x = year, y = price, color = mark)) +
@@ -176,7 +179,7 @@ wykres_rok_cena_EV <- dane_imp %>%
        x = "Rok produkcji",
        y = "Cena (w USD)") +
   theme_minimal()
-plotly(wykres_rok_cena)
+ggplotly(wykres_rok_cena_EV)
 ```
 
 Opis wykresu???
@@ -185,14 +188,15 @@ Opis wykresu???
 
 Analiza statystyczna dla wpływu roku, przebiegu i mocy silnika na cene
 
-``` {r}
+```{r}
 LMP <- lm(price ~ year + mileage + vol_engine, data = dane_imp)
 summary(LMP)
 modelsummary(LMP)
 ```
-Opis modelu 
 
-``` {r}
+Opis modelu
+
+```{r}
 tabela_najdrozsze_samochody <- dane_imp %>%
   filter(year >= 2010) %>%
   group_by(mark) %>%
@@ -208,36 +212,36 @@ tabela_najdrozsze_samochody
 
 Wybieramy marki samochodów z najwyższą średnią ceną i analizujemy zmiane ceny w przeciągu lat.
 
-``` {r}
+```{r}
 wykres_srednia_cena_przez_lata <- dane_imp %>% 
   filter(mark %in% c("mercedes", "bmw", "audi", "volvo", "alfa-romeo")) %>%
   group_by(mark, year) %>%
   summarise(srednia_cena = mean(price)) %>%
   ggplot(aes(x = year, y = srednia_cena, color = mark)) +
   geom_line()
-plotly(wykres_srednia_cena_przez_lata)
+ggplotly(wykres_srednia_cena_przez_lata)
 ```
 
 Opis wykresu????
 
-``` {r}
+```{r}
 wykres_rejestracje <- dane_imp %>%
   filter(year >= 1990) %>%
   group_by(mark, year) %>%
   summarise(liczba_aut_rok = n()) %>%
   ggplot(aes(x = year, y = liczba_aut_rok, color = mark)) +
   geom_line()
-plotly(wykres_rejestracje)
+ggplotly(wykres_rejestracje)
 ```
+
 Opis wykresu???
 
-``` {r}
+```{r}
 wykres_srednia_cena_fuel <- dane_imp %>% 
-  # filter(mark %in% c("mercedes", "bmw", "audi", "volvo", "alfa-romeo")) %>%
   group_by(fuel, year) %>%
   summarise(srednia_cena = mean(price)) %>%
   ggplot(aes(x = year, y = srednia_cena, color = fuel)) +
   geom_line()
 wykres_srednia_cena_fuel
-plotly(wykres_srednia_cena_fuel)
+ggplotly(wykres_srednia_cena_fuel)
 ```

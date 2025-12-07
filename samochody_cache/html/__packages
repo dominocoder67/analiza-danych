@@ -15,3 +15,5 @@ validate
 validatetools
 dcmodify
 errorlocate
+plotly
+modelsummary
