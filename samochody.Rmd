@@ -65,26 +65,49 @@ Celem zbioru jest umożliwienie analizy cen, cech technicznych, profilu ofert i 
 Usunięcie kolumny ..1, ponieważ nie wpływa ona na analizę.
 
 ```{r}
-dane %>% select(-"...1")
+dane <- dane %>%
+  select(-"...1") %>%
+  mutate(
+    fuel = factor(fuel),
+    mark = factor(mark)
+  )
 ```
 
 ```{r}
-procent <- prop_complete_var(dane) * 100
+procent <- naniar::prop_complete_var(dane) * 100
+procent
 ```
 
 W danych znajduje się `r procent` % kompletnych wartości.
 
-```{r message=FALSE, warning=FALSE}
-raport <- VIM::aggr(dane, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, labels=names(dane), cex.axis=.7, gap=3, ylab=c("Procent braków danych","Wzorzec braków danych"))
-
-raport$x
+```{r}
+VIM::aggr(
+  dane,
+  col = c("navyblue", "red"),
+  numbers = TRUE,
+  sortVars = TRUE,
+  labels = names(dane),
+  cex.axis = .7,
+  gap = 3,
+  ylab = c("Procent braków danych", "Wzorzec braków danych")
+)
 ```
 
 ## Imputacje danych
 
 ```{r}
-dane_imp <- hotdeck(dane)
-VIM::aggr(dane_imp, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, labels=names(dane_imp), cex.axis=.7, gap=3, ylab=c("Procent braków danych po imputacji","Wzorzec braków danych po imputacji"))
+dane_imp <- VIM::hotdeck(dane)
+
+VIM::aggr(
+  dane_imp,
+  col = c("navyblue", "red"),
+  numbers = TRUE,
+  sortVars = TRUE,
+  labels = names(dane_imp),
+  cex.axis = .7,
+  gap = 3,
+  ylab = c("Procent braków danych po imputacji", "Wzorzec braków danych po imputacji")
+)
 ```
 
 Po imputacji danych za pomocą metody hotdeck, wszystkie braki danych zostały uzupełnione.
@@ -131,7 +154,7 @@ ggplot(aes(x = mileage, y = price, color = "mark")) +
        x = "Przebieg (w tysiącach, log10)",
        y = "Cena (w USD)") +
   theme_minimal()
-ggplotly(wykres_przebieg_cena_diesel)
+plotly::ggplotly(wykres_przebieg_cena_diesel)
 ```
 
 Opis wykresu??????
@@ -146,7 +169,7 @@ wykres_rok_cena_diesel <- dane_imp %>%
        x = "Rok produkcji",
        y = "Cena (w USD)") +
   theme_minimal()
-ggplotly(wykres_rok_cena_diesel)
+plotly::ggplotly(wykres_rok_cena_diesel)
 ```
 
 Opis wykresu??????
@@ -164,7 +187,7 @@ wykres_przebieg_cena_EV <- dane_imp %>%
        x = "Przebieg (w tysiącach, log10)",
        y = "Cena (w USD)") +
   theme_minimal()
-ggplotly(wykres_przebieg_cena_EV)
+plotly::ggplotly(wykres_przebieg_cena_EV)
 ```
 
 Opis wykresu?????
@@ -179,7 +202,7 @@ wykres_rok_cena_EV <- dane_imp %>%
        x = "Rok produkcji",
        y = "Cena (w USD)") +
   theme_minimal()
-ggplotly(wykres_rok_cena_EV)
+plotly::ggplotly(wykres_rok_cena_EV)
 ```
 
 Opis wykresu???
@@ -219,7 +242,7 @@ wykres_srednia_cena_przez_lata <- dane_imp %>%
   summarise(srednia_cena = mean(price)) %>%
   ggplot(aes(x = year, y = srednia_cena, color = mark)) +
   geom_line()
-ggplotly(wykres_srednia_cena_przez_lata)
+plotly::ggplotly(wykres_srednia_cena_przez_lata)
 ```
 
 Opis wykresu????
@@ -231,17 +254,25 @@ wykres_rejestracje <- dane_imp %>%
   summarise(liczba_aut_rok = n()) %>%
   ggplot(aes(x = year, y = liczba_aut_rok, color = mark)) +
   geom_line()
-ggplotly(wykres_rejestracje)
+plotly::ggplotly(wykres_rejestracje)
 ```
 
 Opis wykresu???
 
 ```{r}
-wykres_srednia_cena_fuel <- dane_imp %>% 
-  group_by(fuel, year) %>%
+wykres_srednia_cena_przez_lata <- dane_imp %>% 
+  filter(mark %in% c("mercedes", "bmw", "audi", "volvo", "alfa-romeo")) %>%
+  group_by(mark, year) %>%
   summarise(srednia_cena = mean(price)) %>%
-  ggplot(aes(x = year, y = srednia_cena, color = fuel)) +
-  geom_line()
-wykres_srednia_cena_fuel
-ggplotly(wykres_srednia_cena_fuel)
+  ggplot(aes(x = year, y = srednia_cena, color = mark)) +
+  geom_line() +
+  scale_y_continuous(labels = scales::label_comma()) +  # Formatuj oś Y
+  labs(
+    title = "Średnia cena samochodów w zależności od roku",
+    x = "Rok",
+    y = "Średnia cena (w USD)"
+  ) +
+  theme_minimal()
+
+plotly::ggplotly(wykres_srednia_cena_przez_lata)
 ```
