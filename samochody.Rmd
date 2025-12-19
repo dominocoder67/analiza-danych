@@ -157,7 +157,7 @@ ggplot(aes(x = mileage, y = price, color = "mark")) +
 plotly::ggplotly(wykres_przebieg_cena_diesel)
 ```
 
-Opis wykresu??????
+Wykres punktowy obrazuje relację między przebiegiem a ceną dla aut spalinowych (benzyna, diesel). Widoczna jest wyraźna ujemna korelacja, podkreślona przez opadającą linię trendu – wyższy przebieg wiąże się ze statystycznie niższą ceną. Zastosowanie skali logarytmicznej uwydatnia dużą zmienność cen, szczególnie wśród aut o niskim przebiegu (lewa strona wykresu), gdzie odnotowano zarówno modele tanie, jak i luksusowe egzemplarze o wartości powyżej 2 mln USD.
 
 ```{r}
 wykres_rok_cena_diesel <- dane_imp %>%
