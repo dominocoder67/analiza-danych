@@ -172,7 +172,15 @@ wykres_rok_cena_diesel <- dane_imp %>%
 plotly::ggplotly(wykres_rok_cena_diesel)
 ```
 
-Opis wykresu??????
+Wykres punktowy z naniesioną krzywą lokalnej regresji (LOESS) ukazuje wyraźnie nieliniową charakterystykę zmian cen w czasie. Rozkład punktów oraz kształt zielonej krzywej trendu wskazują na trzy fazy rynkowe:
+
+Wzrost wykładniczy dla aut nowych: Dla roczników po 2010 roku obserwujemy gwałtowny wzrost cen, osiągający dla najnowszych modeli wartości maksymalne (często powyżej 1-2 mln USD dla marek premium).
+
+Minimum cenowe: Najniższe wyceny dotyczą samochodów z lat 90. i wczesnych 2000. (wiek ok. 20–30 lat) – jest to moment, w którym auto jest postrzegane jako stare, ale jeszcze nie zabytkowe.
+
+Efekt aut kolekcjonerskich: W przypadku pojazdów wyprodukowanych przed 1980 rokiem trend się odwraca – ceny rosną, a niektóre egzemplarze (klasyki) osiągają wartości porównywalne z nowymi autami luksusowymi.
+
+Wniosek: Ceny samochodów nie spadają liniowo. Po okresie gwałtownej utraty wartości (deprecjacji), następuje stabilizacja, a w przypadku aut najstarszych – ponowny wzrost wartości (aprecjacja) wynikający z ich statusu zabytkowego.
 
 ### 3.2 Analiza Hybrid + Electric
 
@@ -190,7 +198,9 @@ wykres_przebieg_cena_EV <- dane_imp %>%
 plotly::ggplotly(wykres_przebieg_cena_EV)
 ```
 
-Opis wykresu?????
+Wykres obrazuje relację ceny do przebiegu dla pojazdów niskoemisyjnych. Podobnie jak w przypadku aut spalinowych, widoczna jest ujemna korelacja (czerwona linia trendu opada), jednak struktura danych jest odmienna. Ze względu na fakt, że technologie te są młodsze na rynku, próba badawcza jest mocniej skoncentrowana w obszarze niższych i średnich przebiegów.
+
+Przebieg pozostaje istotnym czynnikiem cenotwórczym również dla aut elektrycznych i hybrydowych. Mniejsza liczba punktów w skrajnie prawej części wykresu potwierdza, że rynek wtórny tych pojazdów jest wciąż w fazie rozwoju i brakuje na nim aut bardzo mocno wyeksploatowanych.
 
 ```{r}
 wykres_rok_cena_EV <- dane_imp %>%
@@ -205,7 +215,13 @@ wykres_rok_cena_EV <- dane_imp %>%
 plotly::ggplotly(wykres_rok_cena_EV)
 ```
 
-Opis wykresu???
+Wykres punktowy dla pojazdów niskoemisyjnych ukazuje zupełnie inną strukturę rynku niż w przypadku aut tradycyjnych. Krzywa trendu (LOESS) wskazuje na wykładniczy wzrost cen wraz z nowszym rocznikiem, jednak historia tych pojazdów w bazie zaczyna się realnie dopiero w okolicach 2005 roku.
+
+Brak efektu aut zabytkowych: W przeciwieństwie do silników spalinowych, tutaj nie występuje zjawisko wzrostu wartości dla najstarszych roczników. Starsze hybrydy/elektryki (sprzed 2010 r.) są po prostu tanie, co wynika prawdopodobnie z przestarzałej technologii bateryjnej i obaw o ich żywotność.
+
+Rosnące rozwarstwienie cenowe: Dla roczników po 2015 roku obserwujemy ogromną wariancję cen (tzw. efekt wachlarza). Na rynku dostępne są zarówno relatywnie tanie hybrydy miejskie, jak i luksusowe modele elektryczne osiągające ceny rzędu 800 tys. USD, co sugeruje, że segment ten stał się bardzo zróżnicowany.
+
+W segmencie aut elektrycznych i hybrydowych wiek pojazdu jest krytycznym czynnikiem cenotwórczym. Utrata wartości starszych modeli jest głębsza i nieodwracalna, co wiąże się z szybkim postępem technologicznym w tej dziedzinie.
 
 ### 3.3 Analiza ogólna cen i czynników wpływających na cene
 
