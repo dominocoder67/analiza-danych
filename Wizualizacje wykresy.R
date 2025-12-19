@@ -86,3 +86,9 @@ wykres_srednia_cena_fuel <- dane_imp %>%
   geom_line()
 wykres_srednia_cena_fuel
 ggplotly(wykres_srednia_cena_fuel)
+
+wykres_tabela_najdrozsze_samochody <- tabela_najdrozsze_samochody %>%
+  filter(mark %in% c("mercedes", "bmw", "audi", "volvo", "alfa-romeo")) %>%
+ggplot(tabela_najdrozsze_samochody, aes(x = mark)) +
+                                               geom_boxplot()
+wykres_tabela_najdrozsze_samochody

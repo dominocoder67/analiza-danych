@@ -51,12 +51,17 @@ Celem zbioru jest umożliwienie analizy cen, cech technicznych, profilu ofert i 
 
 ### Pytania badawcze
 
-1.  **Jakie są średnie ceny samochodów w zależności od marki?**
-2.  **Które cechy samochodów (np. rok produkcji, przebieg, moc silnika, rodzaj paliwa) mają największy wpływ na cenę pojazdu?**
-3.  **Jak zmieniają się ceny samochodów w zależności od roku produkcji? Czy starsze samochody tanieją liniowo czy nieliniowo?**
-4.  **Czy istnieją różnice w cenach samochodów w zależności od typu pojazdu (np. sedan, SUV, hatchback, kombi)?**
-5.  **Jak przebieg pojazdu wpływa na jego cenę i czy wpływ ten różni się między markami?**
-6.  **Czy rodzaj paliwa (benzyna, diesel, LPG, hybryda, elektryczny) wpływa na cenę?**
+### Pytania badawcze
+
+1. ***Jak przebieg pojazdu wpływa na cenę samochodów spalinowych (Diesel i Gasoline)?***
+2. ***Jak kształtuje się zależność pomiędzy rokiem produkcji a ceną samochodów spalinowych, w tym występowanie minimum cenowego oraz efektu aut kolekcjonerskich?***
+3. ***Jak przebieg pojazdu wpływa na cenę samochodów hybrydowych i elektrycznych?***
+4. ***Jak zależność pomiędzy rokiem produkcji a ceną kształtuje się w przypadku samochodów hybrydowych i elektrycznych oraz czy w tym segmencie występuje efekt aut zabytkowych?***
+5. ***Jaki jest wpływ roku produkcji, przebiegu oraz pojemności silnika na cenę samochodu przy założeniu niezmienności pozostałych cech pojazdu?***
+6. ***Jak zmieniają się średnie ceny samochodów w czasie w zależności od rodzaju paliwa i które typy paliwa charakteryzują się najsilniejszym wzrostem cen?***
+7. ***Które marki samochodów produkowanych po 2010 roku należą do najdroższych pod względem średniej ceny i jak duże jest zróżnicowanie cen w ich obrębie?***
+8. ***Jak kształtują się zmiany średnich cen w czasie dla pięciu najdroższych marek samochodów oraz które z nich wykazują najsilniejszą dynamikę wzrostu lub spadku cen?***
+9. ***Jak zmieniała się liczba rejestracji samochodów według marki w latach 1990–2022 oraz które marki odnotowały największy wzrost liczby rejestracji w 2021 roku?***
 
 ## Analiza danych
 
@@ -233,7 +238,34 @@ summary(LMP)
 modelsummary(LMP)
 ```
 
-Opis modelu
+Przy pozostałych zmiennych stałych (ceteris paribus), wzrost roku produkcji pojazdu o jeden rok wiąże się ze wzrostem przeciętnej ceny samochodu o około 6 535 PLN.
+
+Zwiększenie przebiegu pojazdu o jeden kilometr powoduje przeciętny spadek ceny o około 0,29 PLN, co oznacza obniżenie wartości pojazdu o około 290 PLN przy wzroście przebiegu o 1 000 km.
+
+Z kolei wzrost pojemności silnika o jedną jednostkę prowadzi do przeciętnego wzrostu ceny samochodu o około 57 PLN.
+
+Model wyjaśnia około 56% zróżnicowania cen samochodów, co wskazuje na dobre dopasowanie przy uwzględnieniu podstawowych cech technicznych pojazdu.
+Wszystkie powyższe efekty należy interpretować przy założeniu niezmienności pozostałych cech pojazdu.
+
+```{r}
+wykres_srednia_cena_fuel <- dane_imp %>% 
+  group_by(fuel, year) %>%
+  summarise(srednia_cena = mean(price)) %>%
+  ggplot(aes(x = year, y = srednia_cena, color = fuel)) +
+  geom_line() +
+labs(
+    title = "Średnia cena samochodów w zależności od rodzaju paliwa",
+    x = "Rok",
+    y = "Średnia cena (PLN)",
+    color = "Rodzaj paliwa"
+  ) +
+  theme_minimal()
+ggplotly(wykres_srednia_cena_fuel)
+```
+
+Wykres przedstawia zmiany średniej ceny samochodów w czasie w podziale na rodzaj paliwa. Dla wszystkich analizowanych typów paliwa obserwowany jest ogólny trend wzrostowy cen, szczególnie widoczny w ostatnich latach okresu badawczego.
+
+Najsilniejszy wzrost średnich cen dotyczy samochodów z silnikami Diesel oraz Electric, co wskazuje na rosnącą wartość pojazdów wysokoprężnych oraz elektrycznych na rynku. Pozostałe typy paliwa również wykazują wzrost cen, jednak o wyraźnie mniejszej dynamice.
 
 ```{r}
 tabela_najdrozsze_samochody <- dane_imp %>%
@@ -249,31 +281,11 @@ tabela_najdrozsze_samochody <- dane_imp %>%
 tabela_najdrozsze_samochody
 ```
 
-Wybieramy marki samochodów z najwyższą średnią ceną i analizujemy zmiane ceny w przeciągu lat.
+Analizę przeprowadzono dla samochodów wyprodukowanych po 2010 roku, obliczając podstawowe statystyki cen w podziale na markę pojazdu. Wyniki wskazują na wyraźne zróżnicowanie cen pomiędzy markami.
 
-```{r}
-wykres_srednia_cena_przez_lata <- dane_imp %>% 
-  filter(mark %in% c("mercedes", "bmw", "audi", "volvo", "alfa-romeo")) %>%
-  group_by(mark, year) %>%
-  summarise(srednia_cena = mean(price)) %>%
-  ggplot(aes(x = year, y = srednia_cena, color = mark)) +
-  geom_line()
-plotly::ggplotly(wykres_srednia_cena_przez_lata)
-```
+Najwyższą średnią ceną charakteryzują się marki Mercedes-Benz, BMW, Audi, Volvo oraz Alfa Romeo, co odzwierciedla ich pozycję w wyższych segmentach rynku. W przypadku tych marek obserwuje się również dużą rozpiętość cen, obejmującą zarówno pojazdy relatywnie tanie, jak i bardzo drogie modele.
 
-Opis wykresu????
-
-```{r}
-wykres_rejestracje <- dane_imp %>%
-  filter(year >= 1990) %>%
-  group_by(mark, year) %>%
-  summarise(liczba_aut_rok = n()) %>%
-  ggplot(aes(x = year, y = liczba_aut_rok, color = mark)) +
-  geom_line()
-plotly::ggplotly(wykres_rejestracje)
-```
-
-Opis wykresu???
+Na podstawie średniej ceny wybrano pięć najdroższych marek, dla których w dalszej części analizy zostanie zbadana zmiana cen w kolejnych latach, co pozwoli ocenić długookresowe trendy cenowe.
 
 ```{r}
 wykres_srednia_cena_przez_lata <- dane_imp %>% 
@@ -292,3 +304,28 @@ wykres_srednia_cena_przez_lata <- dane_imp %>%
 
 plotly::ggplotly(wykres_srednia_cena_przez_lata)
 ```
+
+W analizowanym okresie dla wszystkich marek obserwowany jest wzrost średnich cen, jednak największą dynamiką wzrostu w ostatnich latach charakteryzuje się marka Alfa Romeo, dla której średnia cena wyraźnie przyspiesza pod koniec próby.
+
+Jednocześnie w przypadku marki Volvo widoczny jest wyraźny spadek średniej ceny w końcowych latach analizy, co może wskazywać na zmianę struktury oferowanych modeli, większy udział tańszych pojazdów lub krótkookresowe wahania rynkowe.
+
+```{r}
+wykres_rejestracje <- dane_imp %>%
+  filter(year >= 1990) %>%
+  group_by(mark, year) %>%
+  summarise(liczba_aut_rok = n()) %>%
+  ggplot(aes(x = year, y = liczba_aut_rok, color = mark)) +
+  geom_line() +
+   labs(
+    title = "Liczba rejestracji samochodów według marki w latach 1990–2022",
+    x = "Rok",
+    y = "Liczba zarejestrowanych samochodów",
+    color = "Marka"
+  ) +
+  theme_minimal()
+plotly::ggplotly(wykres_rejestracje)
+```
+
+Na wykresie przedstawiono liczbę rejestracji samochodów według marki w latach od 1990 roku. Dla wszystkich analizowanych marek widoczny jest wyraźny pik liczby rejestracji w 2021 roku, co wskazuje na skokowy wzrost liczby nowych rejestracji w okresie COVID.
+
+Najsilniejszy wzrost odnotowano dla marki BMW, dla której liczba rejestracji osiągnęła 1745, oraz dla marki Audi, gdzie liczba rejestracji wyniosła 1262. Pozostałe marki również wykazują zwiększoną aktywność w 2021 roku, jednak na niższym poziomie.
