@@ -268,6 +268,26 @@ Wykres przedstawia zmiany średniej ceny samochodów w czasie w podziale na rodz
 Najsilniejszy wzrost średnich cen dotyczy samochodów z silnikami Diesel oraz Electric, co wskazuje na rosnącą wartość pojazdów wysokoprężnych oraz elektrycznych na rynku. Pozostałe typy paliwa również wykazują wzrost cen, jednak o wyraźnie mniejszej dynamice.
 
 ```{r}
+wykres_boxplot <- dane_imp %>% 
+filter(mark %in% c("mercedes-benz", "bmw", "audi", "volvo", "alfa-romeo")) %>%
+ggplot(aes(x = mark, y = price, fill = mark)) +
+  geom_boxplot() +
+  labs(title = "Rozkład cen wybranych marek samochodów",
+       x = "Marka samochodu",
+       y = "Cena (w PLN)") +
+  theme_minimal()
+wykres_boxplot
+```
+
+Na wykresie przedstawiono wykres pudełkowy (boxplot) rozkładu cen dla wybranych marek samochodów. Boxplot ilustruje medianę ceny, rozstęp międzykwartylowy (IQR) oraz wartości odstające, co pozwala na porównanie poziomu cen i ich zróżnicowania pomiędzy markami.
+
+Marki Mercedes-Benz, BMW oraz Audi charakteryzują się wyższą medianą cen oraz większą zmiennością, co potwierdza ich pozycję w segmencie premium. W przypadku Mercedes-Benz widoczna jest również największa liczba obserwacji odstających, sięgających cen powyżej 2 mln PLN, co wskazuje na obecność bardzo drogich, luksusowych modeli.
+
+Z kolei Alfa Romeo prezentuje relatywnie niższe ceny oraz mniejszy rozrzut, natomiast Volvo zajmuje pozycję pośrednią, z umiarkowaną medianą i zauważalnym, choć mniejszym, zróżnicowaniem cen.
+
+Wykres umożliwia jednoznaczne porównanie rozkładów cen pomiędzy markami oraz identyfikację marek o największej zmienności i liczbie obserwacji odstających.
+
+```{r}
 tabela_najdrozsze_samochody <- dane_imp %>%
   filter(year >= 2010) %>%
   group_by(mark) %>%

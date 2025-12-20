@@ -70,6 +70,17 @@ wykres_srednia_cena_przez_lata <- dane_imp %>%
 wykres_srednia_cena_przez_lata
 ggplotly(wykres_srednia_cena_przez_lata)
 
+wykres_boxplot <- dane_imp %>% 
+filter(mark %in% c("mercedes-benz", "bmw", "audi", "volvo", "alfa-romeo")) %>%
+ggplot(aes(x = mark, y = price, fill = mark)) +
+  geom_boxplot() +
+  labs(title = "Rozkład cen wybranych marek samochodów",
+       x = "Marka samochodu",
+       y = "Cena (w USD)") +
+  theme_minimal()
+wykres_boxplot
+  
+  
 wykres_rejestracje <- dane_imp %>%
   filter(year >= 1990) %>%
   group_by(mark, year) %>%
