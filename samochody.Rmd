@@ -256,6 +256,23 @@ Z kolei wzrost pojemności silnika o jedną jednostkę prowadzi do przeciętnego
 
 Model wyjaśnia około 56% zróżnicowania cen samochodów, co wskazuje na dobre dopasowanie przy uwzględnieniu podstawowych cech technicznych pojazdu. Wszystkie powyższe efekty należy interpretować przy założeniu niezmienności pozostałych cech pojazdu.
 
+```{r macierz_korelacji, echo=FALSE, warning=FALSE, message=FALSE}
+dane_num <- dane_imp %>%
+  select(price, year, mileage, vol_engine)
+
+korelacje <- cor(dane_num, use = "complete.obs")
+
+corrplot::corrplot(
+  korelacje,
+  method = "number",
+  type = "full",
+  diag = TRUE
+)
+```
+Macierz korelacji przedstawia siłę i kierunek zależności liniowych pomiędzy analizowanymi zmiennymi. Najwyższą dodatnią korelację obserwujemy między ceną a rokiem produkcji (r = 0,60), co oznacza, że nowsze samochody są przeciętnie droższe. Z kolei najsilniejsza ujemna korelacja występuje między rokiem produkcji a przebiegiem (r = −0,73), co wskazuje, że starsze pojazdy mają zwykle większy przebieg, co jest zgodne z intuicją.
+
+Dodatkowo cena jest umiarkowanie ujemnie skorelowana z przebiegiem (r = −0,54), co potwierdza, że większa eksploatacja obniża wartość rynkową pojazdu. Natomiast pojemność silnika (vol_engine) wykazuje jedynie słabe związki z pozostałymi zmiennymi (np. z ceną r = 0,30), co sugeruje, że w tym zbiorze danych nie jest ona czynnikiem silnie powiązanym liniowo ani z wiekiem, ani z przebiegiem.
+
 ```{r}
 wykres_srednia_cena_fuel <- dane_imp %>% 
   group_by(fuel, year) %>%
