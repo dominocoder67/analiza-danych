@@ -1,5 +1,5 @@
 ---
-title: "analiza danych - samochody"
+title: "Analiza Danych - Samochody"
 author: "Dominik Bartosiak, Damian Damięcki, Mikołaj Kustusz"
 date: "`r Sys.Date()`"
 output:
@@ -51,23 +51,21 @@ Celem zbioru jest umożliwienie analizy cen, cech technicznych, profilu ofert i 
 
 ### Pytania badawcze
 
-### Pytania badawcze
+1.  ***Jak przebieg pojazdu wpływa na cenę samochodów spalinowych (Diesel i Gasoline)?***
+2.  ***Jak kształtuje się zależność pomiędzy rokiem produkcji a ceną samochodów spalinowych, w tym występowanie minimum cenowego oraz efektu aut kolekcjonerskich?***
+3.  ***Jak przebieg pojazdu wpływa na cenę samochodów hybrydowych i elektrycznych?***
+4.  ***Jak zależność pomiędzy rokiem produkcji a ceną kształtuje się w przypadku samochodów hybrydowych i elektrycznych oraz czy w tym segmencie występuje efekt aut zabytkowych?***
+5.  ***Jaki jest wpływ roku produkcji, przebiegu oraz pojemności silnika na cenę samochodu przy założeniu niezmienności pozostałych cech pojazdu?***
+6.  ***Jak zmieniają się średnie ceny samochodów w czasie w zależności od rodzaju paliwa i które typy paliwa charakteryzują się najsilniejszym wzrostem cen?***
+7.  ***Które marki samochodów produkowanych po 2010 roku należą do najdroższych pod względem średniej ceny i jak duże jest zróżnicowanie cen w ich obrębie?***
+8.  ***Jak kształtują się zmiany średnich cen w czasie dla pięciu najdroższych marek samochodów oraz które z nich wykazują najsilniejszą dynamikę wzrostu lub spadku cen?***
+9.  ***Jak zmieniała się liczba rejestracji samochodów według marki w latach 1990–2022 oraz które marki odnotowały największy wzrost liczby rejestracji w 2021 roku?***
 
-1. ***Jak przebieg pojazdu wpływa na cenę samochodów spalinowych (Diesel i Gasoline)?***
-2. ***Jak kształtuje się zależność pomiędzy rokiem produkcji a ceną samochodów spalinowych, w tym występowanie minimum cenowego oraz efektu aut kolekcjonerskich?***
-3. ***Jak przebieg pojazdu wpływa na cenę samochodów hybrydowych i elektrycznych?***
-4. ***Jak zależność pomiędzy rokiem produkcji a ceną kształtuje się w przypadku samochodów hybrydowych i elektrycznych oraz czy w tym segmencie występuje efekt aut zabytkowych?***
-5. ***Jaki jest wpływ roku produkcji, przebiegu oraz pojemności silnika na cenę samochodu przy założeniu niezmienności pozostałych cech pojazdu?***
-6. ***Jak zmieniają się średnie ceny samochodów w czasie w zależności od rodzaju paliwa i które typy paliwa charakteryzują się najsilniejszym wzrostem cen?***
-7. ***Które marki samochodów produkowanych po 2010 roku należą do najdroższych pod względem średniej ceny i jak duże jest zróżnicowanie cen w ich obrębie?***
-8. ***Jak kształtują się zmiany średnich cen w czasie dla pięciu najdroższych marek samochodów oraz które z nich wykazują najsilniejszą dynamikę wzrostu lub spadku cen?***
-9. ***Jak zmieniała się liczba rejestracji samochodów według marki w latach 1990–2022 oraz które marki odnotowały największy wzrost liczby rejestracji w 2021 roku?***
-
-## Analiza danych
+# 2 Analiza danych
 
 ## 2.1 Braki danych
 
-Usunięcie kolumny ..1, ponieważ nie wpływa ona na analizę.
+Na wstępie przeprowadzono wstępne przygotowanie danych do analizy. Usunięto kolumnę `..1`, która pełniła jedynie funkcję pomocniczą (indeksową) i nie zawierała informacji istotnych z punktu widzenia dalszych analiz. Dodatkowo zmienne `fuel` oraz `mark` zostały przekształcone do typu czynnikowego (*factor*), co umożliwia ich poprawne wykorzystanie w analizach statystycznych oraz wizualizacjach.
 
 ```{r}
 dane <- dane %>%
@@ -78,12 +76,14 @@ dane <- dane %>%
   )
 ```
 
+Następnie oszacowano udział kompletnych obserwacji w zbiorze danych. Pozwoliło to na ogólną ocenę jakości danych oraz skalę problemu braków danych.
+
 ```{r}
 procent <- naniar::prop_complete_var(dane) * 100
 procent
 ```
 
-W danych znajduje się `r procent` % kompletnych wartości.
+W danych znajduje się `r round(procent)` % kompletnych wartości.
 
 ```{r}
 VIM::aggr(
@@ -98,7 +98,9 @@ VIM::aggr(
 )
 ```
 
-## Imputacje danych
+Aby dokładniej przeanalizować strukturę braków danych, zastosowano graficzną prezentację wzorców braków przy użyciu funkcji aggr() z pakietu VIM. Wykres umożliwia identyfikację zmiennych najbardziej obciążonych brakami danych oraz ocenę, czy braki występują losowo, czy też tworzą określone wzorce.
+
+### Imputacje danych
 
 ```{r}
 dane_imp <- VIM::hotdeck(dane)
@@ -115,13 +117,15 @@ VIM::aggr(
 )
 ```
 
-Po imputacji danych za pomocą metody hotdeck, wszystkie braki danych zostały uzupełnione.
+W celu umożliwienia dalszej analizy statystycznej oraz uniknięcia utraty obserwacji, przeprowadzono imputację brakujących danych z wykorzystaniem metody hot-deck. Metoda ta polega na zastępowaniu brakujących wartości obserwacjami pochodzącymi od podobnych jednostek, co pozwala zachować strukturę rozkładów zmiennych.
 
 ## 2.2 Walidacja danych
 
 ### Reguły
 
-Rozpatrzmy następujący zbiór danych. Co widzisz w początkowych wierszach?
+Kolejnym etapem analizy była walidacja poprawności danych. W pierwszej kolejności dokonano wstępnego przeglądu wybranych zmiennych w celu oceny ich zakresów i struktury. Następnie każdej obserwacji przypisano unikalny identyfikator, co umożliwiło jednoznaczną identyfikację rekordów w procesie walidacji.
+
+Zdefiniowano podstawowe reguły walidacyjne obejmujące nieujemne wartości ceny i przebiegu, poprawny zakres lat produkcji oraz dopuszczalne kategorie rodzaju paliwa. Zastosowanie tych reguł wykazało, że wszystkie obserwacje spełniają przyjęte warunki logiczne.
 
 ```{r}
 data(dane_imp)
@@ -142,11 +146,17 @@ barplot(cf, main="Samochody - Walidacja danych")
 #as.data.frame(cf) %>% head()
 ```
 
-Wszystkie dane są poprawne zgodnie z ustalonymi regułami walidacji.
+Na tej podstawie można stwierdzić, że zbiór danych jest poprawny i gotowy do dalszej analizy statystycznej oraz wizualizacji.
 
-## 3 Wizualizacja Danych
+# 3 Wizualizacja Danych
 
-### 3.1 Analiza Diesel + Gasoline
+W niniejszym rozdziale przeprowadzono analizę oraz wizualizację danych, których celem jest identyfikacja zależności pomiędzy kluczowymi cechami pojazdów a ich ceną rynkową. Uzyskane wyniki stanowią podstawę do formułowania wniosków oraz udzielenia odpowiedzi na postawione wcześniej pytania badawcze.
+
+Ze względu na dużą liczebność zbioru danych oraz jego zróżnicowanie, analizę podzielono na trzy główne sekcje. W pierwszej części skoncentrowano się na pojazdach z silnikami spalinowymi, obejmującymi samochody zasilane paliwem typu Diesel oraz Gasoline. W drugiej części przeanalizowano pojazdy niskoemisyjne, tj. samochody hybrydowe oraz elektryczne, które charakteryzują się odmienną dynamiką cenową oraz krótszą historią rynkową.
+
+Ze względu na niewielką liczebność obserwacji oraz ograniczoną porównywalność wyników, w niniejszym opracowaniu zrezygnowano ze szczegółowej analizy pojazdów zasilanych LPG oraz CNG. Ostatnia część analizy obejmuje identyfikację najdroższych marek samochodów oraz pogłębioną analizę zmian cen wybranych marek w ujęciu czasowym, co pozwala na ocenę długookresowych trendów cenowych w segmencie pojazdów premium.
+
+## 3.1 Analiza Diesel + Gasoline
 
 ```{r}
 wykres_przebieg_cena_diesel <- dane_imp %>%
@@ -187,7 +197,7 @@ Efekt aut kolekcjonerskich: W przypadku pojazdów wyprodukowanych przed 1980 rok
 
 Wniosek: Ceny samochodów nie spadają liniowo. Po okresie gwałtownej utraty wartości (deprecjacji), następuje stabilizacja, a w przypadku aut najstarszych – ponowny wzrost wartości (aprecjacja) wynikający z ich statusu zabytkowego.
 
-### 3.2 Analiza Hybrid + Electric
+## 3.2 Analiza Hybrid + Electric
 
 ```{r}
 wykres_przebieg_cena_EV <- dane_imp %>%
@@ -228,7 +238,7 @@ Rosnące rozwarstwienie cenowe: Dla roczników po 2015 roku obserwujemy ogromną
 
 W segmencie aut elektrycznych i hybrydowych wiek pojazdu jest krytycznym czynnikiem cenotwórczym. Utrata wartości starszych modeli jest głębsza i nieodwracalna, co wiąże się z szybkim postępem technologicznym w tej dziedzinie.
 
-### 3.3 Analiza ogólna cen i czynników wpływających na cene
+## 3.3 Analiza ogólna cen i czynników wpływających na cene
 
 Analiza statystyczna dla wpływu roku, przebiegu i mocy silnika na cene
 
@@ -244,8 +254,7 @@ Zwiększenie przebiegu pojazdu o jeden kilometr powoduje przeciętny spadek ceny
 
 Z kolei wzrost pojemności silnika o jedną jednostkę prowadzi do przeciętnego wzrostu ceny samochodu o około 57 PLN.
 
-Model wyjaśnia około 56% zróżnicowania cen samochodów, co wskazuje na dobre dopasowanie przy uwzględnieniu podstawowych cech technicznych pojazdu.
-Wszystkie powyższe efekty należy interpretować przy założeniu niezmienności pozostałych cech pojazdu.
+Model wyjaśnia około 56% zróżnicowania cen samochodów, co wskazuje na dobre dopasowanie przy uwzględnieniu podstawowych cech technicznych pojazdu. Wszystkie powyższe efekty należy interpretować przy założeniu niezmienności pozostałych cech pojazdu.
 
 ```{r}
 wykres_srednia_cena_fuel <- dane_imp %>% 
@@ -271,12 +280,12 @@ Najsilniejszy wzrost średnich cen dotyczy samochodów z silnikami Diesel oraz E
 tabela_najdrozsze_samochody <- dane_imp %>%
   filter(year >= 2010) %>%
   group_by(mark) %>%
-  summarise(srednia_cena = mean(price),
-            mediana_cena = median(price),
-            najdroższy = max(price),
-            najtańszy = min(price),
-            liczba_samochodow = n()) %>%
-  arrange(desc(srednia_cena))
+  summarise("Średnia cena" = mean(price),
+            "Mediana ceny" = median(price),
+            "Najdroższy egzemplarz" = max(price),
+            "Najtańszy egzemplarz" = min(price),
+            "Łączna liczba samochodów" = n()) %>%
+  arrange(desc("Średnia cena"))
 
 tabela_najdrozsze_samochody
 ```
@@ -348,3 +357,17 @@ plotly::ggplotly(wykres_rejestracje)
 Na wykresie przedstawiono liczbę rejestracji samochodów według marki w latach od 1990 roku. Dla wszystkich analizowanych marek widoczny jest wyraźny pik liczby rejestracji w 2021 roku, co wskazuje na skokowy wzrost liczby nowych rejestracji w okresie COVID.
 
 Najsilniejszy wzrost odnotowano dla marki BMW, dla której liczba rejestracji osiągnęła 1745, oraz dla marki Audi, gdzie liczba rejestracji wyniosła 1262. Pozostałe marki również wykazują zwiększoną aktywność w 2021 roku, jednak na niższym poziomie.
+
+# 4 Wnioski
+
+Na podstawie przeprowadzonej analizy danych udało się udzielić odpowiedzi na wszystkie postawione pytania badawcze oraz zidentyfikować kluczowe czynniki wpływające na kształtowanie się cen samochodów na polskim rynku.
+
+Przeprowadzona analiza danych pozwoliła zidentyfikować kluczowe czynniki wpływające na ceny samochodów na polskim rynku. Jednym z najistotniejszych determinantów ceny okazał się przebieg pojazdu, który wykazuje wyraźną ujemną zależność z ceną zarówno w segmencie samochodów spalinowych, jak i hybrydowych oraz elektrycznych. Wraz ze wzrostem przebiegu wartość pojazdu systematycznie maleje.
+
+Analiza zależności pomiędzy rokiem produkcji a ceną wykazała nieliniowy charakter deprecjacji samochodów. W przypadku pojazdów spalinowych po okresie spadku wartości występuje efekt wzrostu cen dla najstarszych modeli o charakterze kolekcjonerskim. Zjawisko to nie występuje w segmencie pojazdów hybrydowych i elektrycznych, gdzie starsze modele tracą na wartości w sposób trwały, co wynika z szybkiego postępu technologicznego.
+
+Wyniki modelu regresji potwierdziły, że rok produkcji, przebieg oraz pojemność silnika mają istotny wpływ na cenę samochodu, przy czym model wyjaśnia znaczną część zróżnicowania cen pojazdów. Dodatkowo zaobserwowano, że rodzaj paliwa różnicuje dynamikę cen, a najsilniejszy wzrost średnich cen dotyczy pojazdów z silnikami wysokoprężnymi oraz elektrycznymi.
+
+Analiza marek wykazała wyraźne zróżnicowanie cenowe, z dominacją marek premium takich jak Mercedes-Benz, BMW, Audi, Volvo oraz Alfa Romeo. W ostatnich latach największą dynamikę wzrostu cen odnotowano dla marki Alfa Romeo, natomiast w przypadku Volvo zaobserwowano spadek średnich cen w końcowym okresie analizy. Dodatkowo analiza liczby rejestracji wskazała na wyraźny wzrost aktywności rynkowej w 2021 roku, szczególnie dla marek BMW oraz Audi.
+
+Podsumowując, ceny samochodów kształtowane są przez kombinację cech technicznych, wieku pojazdu, rodzaju napędu oraz uwarunkowań rynkowych, a ich wpływ różni się pomiędzy segmentami rynku.
