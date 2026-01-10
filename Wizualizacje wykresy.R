@@ -152,5 +152,57 @@ ggbetweenstats(
  x = fuel,
  y = price
 )
-packageVersion("ggplot2")
+
+test_mileage_price <- ggscatterstats(
+  data = dane_imp,
+  x = mileage,
+  y = price,
+  title = "Zależność między przebiegiem a ceną samochodu",
+  xlab = "Przebieg (w tysiącach km)",
+  ylab = "Cena (PLN)"
+)
+
+test_mileage_price
+
+test_year_price <- ggscatterstats(
+  data = dane_imp,
+  x = year,
+  y = price,
+  title = "Zależność między rokiem produkcji a ceną samochodu",
+  xlab = "Rok produkcji",
+  ylab = "Cena (PLN)"
+)
+test_year_price
+
+test_mark_price <- ggbetweenstats(
+  data = dane_imp %>% filter(mark %in% c("audi", "bmw", "mercedes-benz", "volvo", "alfa-romeo")),
+  x = mark,
+  y = price,
+  title = "Porównanie cen samochodów wybranych marek",
+  xlab = "Marka samochodu",
+  ylab = "Cena (PLN)"
+)
+test_mark_price
+
+test_anova_fuel_mileage_year_price <- aov(price ~ fuel + mileage + year, data = dane_imp)
+ggcoefstats(test_anova_fuel_mileage_year_price,
+             title = "Wpływ rodzaju paliwa, przebiegu i roku produkcji na cenę samochodu",
+             xlab = "Czynniki",
+             ylab = "Współczynniki")
+
+rejestracje <- dane_imp %>%
+  filter(year >= 1990) %>%
+  group_by(mark, year) %>%
+  summarise(liczba_aut_rok = n(), .groups = "drop") %>%
+  mutate(okres = ifelse(year == 2021, "2021", "Pozostałe lata"))
+
+ggbetweenstats(
+  data = rejestracje,
+  x = okres,
+  y = liczba_aut_rok,
+  type = "nonparametric",
+  title = "Czy 2021 różni się od pozostałych lat?",
+  xlab = "",
+  ylab = "Liczba zarejestrowanych samochodów"
+)
 

@@ -337,7 +337,7 @@ Wykres umożliwia jednoznaczne porównanie rozkładów cen pomiędzy markami ora
 
 ```{r}
 wykres_srednia_cena_przez_lata <- dane_imp %>% 
-  filter(mark %in% c("mercedes", "bmw", "audi", "volvo", "alfa-romeo")) %>%
+  filter(mark %in% c("mercedes-benz", "bmw", "audi", "volvo", "alfa-romeo")) %>%
   group_by(mark, year) %>%
   summarise(srednia_cena = mean(price)) %>%
   ggplot(aes(x = year, y = srednia_cena, color = mark)) +
@@ -380,7 +380,67 @@ Najsilniejszy wzrost odnotowano dla marki BMW, dla której liczba rejestracji os
 
 # 4 Testy Statystyczne
 
+W celu oceny istotności wpływu roku produkcji, przebiegu oraz pojemności silnika na cenę samochodu, przeprowadzono analizę regresji liniowej wielorakiej. Model ten pozwala na jednoczesne uwzględnienie kilku zmiennych niezależnych i ocenę ich wpływu na zmienną zależną (cenę).
 
+```{r}
+test_fuel_price <- ggbetweenstats(
+ data = dane_imp,
+ x = fuel,
+ y = price,
+ title = "Porównanie cen samochodów w zależności od rodzaju paliwa",
+ xlab = "Rodzaj paliwa",
+ ylab = "Cena (PLN)"
+)
+
+test_fuel_price
+```
+
+Wnioski
+
+```{r}
+test_mark_price <- ggbetweenstats(
+  data = dane_imp %>% filter(mark %in% c("audi", "bmw", "mercedes-benz", "volvo", "alfa-romeo")),
+  x = mark,
+  y = price,
+  title = "Porównanie cen samochodów wybranych marek",
+  xlab = "Marka samochodu",
+  ylab = "Cena (PLN)"
+)
+test_mark_price
+```
+
+Wnioski
+
+```{r}
+test_anova_fuel_mileage_year_price <- aov(price ~ fuel + mileage + year, data = dane_imp)
+wizualizacja_anova <- ggcoefstats(test_anova_fuel_mileage_year_price,
+             title = "Wpływ rodzaju paliwa, przebiegu i roku produkcji na cenę samochodu",
+             xlab = "Czynniki",
+             ylab = "Współczynniki")
+interactionplot(wizualizacja_anova)
+```
+
+Wnioski
+
+```{r}
+rejestracje <- dane_imp %>%
+  filter(year >= 1990) %>%
+  group_by(mark, year) %>%
+  summarise(liczba_aut_rok = n(), .groups = "drop") %>%
+  mutate(okres = ifelse(year == 2021, "2021", "Pozostałe lata"))
+
+ggbetweenstats(
+  data = rejestracje,
+  x = okres,
+  y = liczba_aut_rok,
+  type = "nonparametric",
+  title = "Czy 2021 różni się od pozostałych lat?",
+  xlab = "",
+  ylab = "Liczba zarejestrowanych samochodów"
+)
+```
+
+Wnioski
 
 # 5 Wnioski
 
