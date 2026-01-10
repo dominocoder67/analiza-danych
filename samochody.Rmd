@@ -23,6 +23,8 @@ if (!require(dcmodify)) install.packages("dcmodify")
 if (!require(errorlocate)) install.packages("errorlocate")
 if (!require(plotly)) install.packages("plotly")
 if (!require(modelsummary)) install.packages("modelsummary")
+if (!require(ggstatsplot)) install.packages("ggstatsplot")
+
 
 library(tidyverse)
 library(dplyr)
@@ -35,6 +37,7 @@ library(dcmodify)
 library(errorlocate)
 library(plotly)
 library(modelsummary)
+library(ggstatsplot)
 
 dane <- read_csv("dane/Car_Prices_Poland_Kaggle.csv")
 ```
@@ -375,7 +378,11 @@ Na wykresie przedstawiono liczbę rejestracji samochodów według marki w latach
 
 Najsilniejszy wzrost odnotowano dla marki BMW, dla której liczba rejestracji osiągnęła 1745, oraz dla marki Audi, gdzie liczba rejestracji wyniosła 1262. Pozostałe marki również wykazują zwiększoną aktywność w 2021 roku, jednak na niższym poziomie.
 
-# 4 Wnioski
+# 4 Testy Statystyczne
+
+
+
+# 5 Wnioski
 
 Na podstawie przeprowadzonej analizy danych udało się udzielić odpowiedzi na wszystkie postawione pytania badawcze oraz zidentyfikować kluczowe czynniki wpływające na kształtowanie się cen samochodów na polskim rynku.
 

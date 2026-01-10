@@ -103,3 +103,54 @@ wykres_tabela_najdrozsze_samochody <- tabela_najdrozsze_samochody %>%
 ggplot(tabela_najdrozsze_samochody, aes(x = mark)) +
                                                geom_boxplot()
 wykres_tabela_najdrozsze_samochody
+
+tabela_najdrozsze_samochody <- dane_imp %>%
+  filter(year >= 2010) %>%
+  group_by(mark) %>%
+  summarise("Średnia cena" = mean(price),
+            "Mediana ceny" = median(price),
+            najdroższy = max(price),
+            najtańszy = min(price),
+            liczba_samochodow = n()) %>%
+  arrange(desc("Średnia cena"))
+
+tabela_najdrozsze_samochody
+
+
+```{r macierz_korelacji, echo=FALSE, warning=FALSE, message=FALSE}
+# wybór zmiennych liczbowych
+dane_num <- dane_imp %>%
+  select(price, year, mileage, vol_engine)
+
+# obliczenie macierzy korelacji
+korelacje <- cor(dane_num, use = "complete.obs")
+
+# wizualizacja pełnej (kwadratowej) macierzy korelacji
+corrplot::corrplot(
+  korelacje,
+  method = "number",
+  type = "full",
+  diag = TRUE
+)
+
+wykres_srednia_cena_fuel <- dane_imp %>% 
+  group_by(fuel, year) %>%
+  summarise(srednia_cena = mean(price)) %>%
+  ggplot(aes(x = year, y = srednia_cena, color = fuel)) +
+  geom_line() +
+  labs(
+    title = "Średnia cena samochodów w zależności od rodzaju paliwa",
+    x = "Rok",
+    y = "Średnia cena (PLN)",
+    color = "Rodzaj paliwa"
+  ) +
+  theme_minimal()
+ggplotly(wykres_srednia_cena_fuel)
+
+ggbetweenstats(
+ data = dane_imp,
+ x = fuel,
+ y = price
+)
+packageVersion("ggplot2")
+
