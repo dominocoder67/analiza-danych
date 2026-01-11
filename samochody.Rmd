@@ -11,7 +11,11 @@ output:
 
 ```{r setup, include=FALSE}
 ## Global options
-knitr::opts_chunk$set(cache = TRUE)
+knitr::opts_chunk$set(
+  echo = FALSE,      
+  message = FALSE,   
+  warning = FALSE
+)
 if (!require(tidyverse)) install.packages("tidyverse")
 if (!require(dplyr)) install.packages("dplyr")
 if (!require(naniar)) install.packages("naniar")
@@ -24,7 +28,9 @@ if (!require(errorlocate)) install.packages("errorlocate")
 if (!require(plotly)) install.packages("plotly")
 if (!require(modelsummary)) install.packages("modelsummary")
 if (!require(ggstatsplot)) install.packages("ggstatsplot")
-
+if (!require(htmlwidgets)) install.packages("htmlwidgets")
+if (!require(knitr)) install.packages("knitr")
+if (!require(kableExtra)) install.packages("kableExtra")
 
 library(tidyverse)
 library(dplyr)
@@ -38,6 +44,10 @@ library(errorlocate)
 library(plotly)
 library(modelsummary)
 library(ggstatsplot)
+library(htmlwidgets)
+library(knitr)
+library(kableExtra)
+
 
 dane <- read_csv("dane/Car_Prices_Poland_Kaggle.csv")
 ```
@@ -70,7 +80,7 @@ Celem zbioru jest umożliwienie analizy cen, cech technicznych, profilu ofert i 
 
 Na wstępie przeprowadzono wstępne przygotowanie danych do analizy. Usunięto kolumnę `..1`, która pełniła jedynie funkcję pomocniczą (indeksową) i nie zawierała informacji istotnych z punktu widzenia dalszych analiz. Dodatkowo zmienne `fuel` oraz `mark` zostały przekształcone do typu czynnikowego (*factor*), co umożliwia ich poprawne wykorzystanie w analizach statystycznych oraz wizualizacjach.
 
-```{r}
+```{r, echo=FALSE}
 dane <- dane %>%
   select(-"...1") %>%
   mutate(
@@ -81,14 +91,14 @@ dane <- dane %>%
 
 Następnie oszacowano udział kompletnych obserwacji w zbiorze danych. Pozwoliło to na ogólną ocenę jakości danych oraz skalę problemu braków danych.
 
-```{r}
+```{r, echo=FALSE}
 procent <- naniar::prop_complete_var(dane) * 100
 procent
 ```
 
 W danych znajduje się `r round(procent)` % kompletnych wartości.
 
-```{r}
+```{r, echo=FALSE}
 VIM::aggr(
   dane,
   col = c("navyblue", "red"),
@@ -105,7 +115,7 @@ Aby dokładniej przeanalizować strukturę braków danych, zastosowano graficzn�
 
 ### Imputacje danych
 
-```{r}
+```{r, echo=FALSE}
 dane_imp <- VIM::hotdeck(dane)
 
 VIM::aggr(
@@ -130,7 +140,7 @@ Kolejnym etapem analizy była walidacja poprawności danych. W pierwszej kolejno
 
 Zdefiniowano podstawowe reguły walidacyjne obejmujące nieujemne wartości ceny i przebiegu, poprawny zakres lat produkcji oraz dopuszczalne kategorie rodzaju paliwa. Zastosowanie tych reguł wykazało, że wszystkie obserwacje spełniają przyjęte warunki logiczne.
 
-```{r}
+```{r, echo=FALSE}
 data(dane_imp)
 head(dane_imp[3:7],3)
 # dodajmy ID
@@ -172,7 +182,8 @@ ggplot(aes(x = mileage, y = price, color = mark)) +
        x = "Przebieg (w tysiącach, log10)",
        y = "Cena (w PLN)") +
   theme_minimal()
-plotly::ggplotly(wykres_przebieg_cena_diesel)
+wpcd <- plotly::ggplotly(wykres_przebieg_cena_diesel)
+wpcd
 ```
 
 Wykres punktowy obrazuje relację między przebiegiem a ceną dla aut spalinowych (benzyna, diesel). Widoczna jest wyraźna ujemna korelacja, podkreślona przez opadającą linię trendu – wyższy przebieg wiąże się ze statystycznie niższą ceną. Zastosowanie skali logarytmicznej uwydatnia dużą zmienność cen, szczególnie wśród aut o niskim przebiegu (lewa strona wykresu), gdzie odnotowano zarówno modele tanie, jak i luksusowe egzemplarze o wartości powyżej 2 mln USD.
@@ -187,7 +198,8 @@ wykres_rok_cena_diesel <- dane_imp %>%
        x = "Rok produkcji",
        y = "Cena (w PLN)") +
   theme_minimal()
-plotly::ggplotly(wykres_rok_cena_diesel)
+wrcd <- plotly::ggplotly(wykres_rok_cena_diesel)
+wrcd
 ```
 
 Wykres punktowy z naniesioną krzywą lokalnej regresji (LOESS) ukazuje wyraźnie nieliniową charakterystykę zmian cen w czasie. Rozkład punktów oraz kształt zielonej krzywej trendu wskazują na trzy fazy rynkowe:
@@ -213,7 +225,8 @@ wykres_przebieg_cena_EV <- dane_imp %>%
        x = "Przebieg (w tysiącach, log10)",
        y = "Cena (w PLN)") +
   theme_minimal()
-plotly::ggplotly(wykres_przebieg_cena_EV)
+wpcE <- plotly::ggplotly(wykres_przebieg_cena_EV)
+wpcE
 ```
 
 Wykres obrazuje relację ceny do przebiegu dla pojazdów niskoemisyjnych. Podobnie jak w przypadku aut spalinowych, widoczna jest ujemna korelacja (czerwona linia trendu opada), jednak struktura danych jest odmienna. Ze względu na fakt, że technologie te są młodsze na rynku, próba badawcza jest mocniej skoncentrowana w obszarze niższych i średnich przebiegów.
@@ -230,7 +243,8 @@ wykres_rok_cena_EV <- dane_imp %>%
        x = "Rok produkcji",
        y = "Cena (w USD)") +
   theme_minimal()
-plotly::ggplotly(wykres_rok_cena_EV)
+wrcE <- plotly::ggplotly(wykres_rok_cena_EV)
+wrcE
 ```
 
 Wykres punktowy dla pojazdów niskoemisyjnych ukazuje zupełnie inną strukturę rynku niż w przypadku aut tradycyjnych. Krzywa trendu (LOESS) wskazuje na wykładniczy wzrost cen wraz z nowszym rocznikiem, jednak historia tych pojazdów w bazie zaczyna się realnie dopiero w okolicach 2005 roku.
@@ -248,7 +262,8 @@ Analiza statystyczna dla wpływu roku, przebiegu i mocy silnika na cene
 ```{r}
 LMP <- lm(price ~ year + mileage + vol_engine, data = dane_imp)
 summary(LMP)
-modelsummary(LMP)
+model_liniowy_tabelka <- modelsummary(LMP)
+model_liniowy_tabelka
 ```
 
 Przy pozostałych zmiennych stałych (ceteris paribus), wzrost roku produkcji pojazdu o jeden rok wiąże się ze wzrostem przeciętnej ceny samochodu o około 6 535 PLN.
@@ -265,13 +280,15 @@ dane_num <- dane_imp %>%
 
 korelacje <- cor(dane_num, use = "complete.obs")
 
-corrplot::corrplot(
+macierz_korelacji <- corrplot::corrplot(
   korelacje,
   method = "number",
   type = "full",
   diag = TRUE
 )
+macierz_korelacji
 ```
+
 Macierz korelacji przedstawia siłę i kierunek zależności liniowych pomiędzy analizowanymi zmiennymi. Najwyższą dodatnią korelację obserwujemy między ceną a rokiem produkcji (r = 0,60), co oznacza, że nowsze samochody są przeciętnie droższe. Z kolei najsilniejsza ujemna korelacja występuje między rokiem produkcji a przebiegiem (r = −0,73), co wskazuje, że starsze pojazdy mają zwykle większy przebieg, co jest zgodne z intuicją.
 
 Dodatkowo cena jest umiarkowanie ujemnie skorelowana z przebiegiem (r = −0,54), co potwierdza, że większa eksploatacja obniża wartość rynkową pojazdu. Natomiast pojemność silnika (vol_engine) wykazuje jedynie słabe związki z pozostałymi zmiennymi (np. z ceną r = 0,30), co sugeruje, że w tym zbiorze danych nie jest ona czynnikiem silnie powiązanym liniowo ani z wiekiem, ani z przebiegiem.
@@ -289,7 +306,8 @@ labs(
     color = "Rodzaj paliwa"
   ) +
   theme_minimal()
-ggplotly(wykres_srednia_cena_fuel)
+wscf <- ggplotly(wykres_srednia_cena_fuel)
+wscf
 ```
 
 Wykres przedstawia zmiany średniej ceny samochodów w czasie w podziale na rodzaj paliwa. Dla wszystkich analizowanych typów paliwa obserwowany jest ogólny trend wzrostowy cen, szczególnie widoczny w ostatnich latach okresu badawczego.
@@ -300,14 +318,29 @@ Najsilniejszy wzrost średnich cen dotyczy samochodów z silnikami Diesel oraz E
 tabela_najdrozsze_samochody <- dane_imp %>%
   filter(year >= 2010) %>%
   group_by(mark) %>%
-  summarise("Średnia cena" = mean(price),
-            "Mediana ceny" = median(price),
-            "Najdroższy egzemplarz" = max(price),
-            "Najtańszy egzemplarz" = min(price),
-            "Łączna liczba samochodów" = n()) %>%
-  arrange(desc("Średnia cena"))
+  summarise(
+    `Srednia cena (PLN)` = round(mean(price), 0),
+    `Mediana ceny (PLN)` = round(median(price), 0),
+    `Najdrozszy egzemplarz (PLN)` = max(price),
+    `Najtanszy egzemplarz (PLN)` = min(price),
+    `Liczba ofert` = n()
+  ) %>%
+  arrange(desc(`Srednia cena (PLN)`))
 
-tabela_najdrozsze_samochody
+tabela_najdrozsze_samochody %>%
+  kable(
+    format = "html",
+    caption = "Statystyki cen samochodów wyprodukowanych po 2010 roku według marki",
+    align = "c"
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    position = "center"
+  ) %>%
+  column_spec(1, bold = TRUE) %>%
+  row_spec(0, bold = TRUE)
+
 ```
 
 Analizę przeprowadzono dla samochodów wyprodukowanych po 2010 roku, obliczając podstawowe statystyki cen w podziale na markę pojazdu. Wyniki wskazują na wyraźne zróżnicowanie cen pomiędzy markami.
@@ -350,7 +383,8 @@ wykres_srednia_cena_przez_lata <- dane_imp %>%
   ) +
   theme_minimal()
 
-plotly::ggplotly(wykres_srednia_cena_przez_lata)
+wscpl <- plotly::ggplotly(wykres_srednia_cena_przez_lata)
+wscpl
 ```
 
 W analizowanym okresie dla wszystkich marek obserwowany jest wzrost średnich cen, jednak największą dynamiką wzrostu w ostatnich latach charakteryzuje się marka Alfa Romeo, dla której średnia cena wyraźnie przyspiesza pod koniec próby.
@@ -371,7 +405,8 @@ wykres_rejestracje <- dane_imp %>%
     color = "Marka"
   ) +
   theme_minimal()
-plotly::ggplotly(wykres_rejestracje)
+wr <- plotly::ggplotly(wykres_rejestracje)
+wr
 ```
 
 Na wykresie przedstawiono liczbę rejestracji samochodów według marki w latach od 1990 roku. Dla wszystkich analizowanych marek widoczny jest wyraźny pik liczby rejestracji w 2021 roku, co wskazuje na skokowy wzrost liczby nowych rejestracji w okresie COVID.
@@ -395,7 +430,13 @@ test_fuel_price <- ggbetweenstats(
 test_fuel_price
 ```
 
-Wnioski
+Na podstawie przeprowadzonego testu porównania cen samochodów względem rodzaju paliwa stwierdzono, że rodzaj paliwa ma statystycznie istotny wpływ na cenę pojazdu (p \< 0,001). Oznacza to, że obserwowane różnice cen pomiędzy grupami paliwowymi nie są dziełem przypadku.
+
+Wielkość efektu jest bardzo wysoka (η²ₚ = 0,97), co wskazuje, że rodzaj paliwa wyjaśnia około 97% zróżnicowania cen samochodów w analizowanym zbiorze danych. Świadczy to o istotności praktycznej wyniku, a nie jedynie istotności statystycznej.
+
+Dodatkowo, przedział ufności dla miary efektu jest bardzo wąski i mieści się w zakresie [0,97; 1,00], co potwierdza wysoką precyzję oszacowania oraz stabilność uzyskanych wyników.
+
+Podsumowując, rodzaj paliwa stanowi jeden z kluczowych czynników różnicujących ceny samochodów, a jego wpływ ma zarówno znaczenie statystyczne, jak i praktyczne
 
 ```{r}
 test_mark_price <- ggbetweenstats(
@@ -409,7 +450,11 @@ test_mark_price <- ggbetweenstats(
 test_mark_price
 ```
 
-Wnioski
+Na podstawie przeprowadzonego testu stwierdzono, że marka samochodu z segmentu premium ma statystycznie istotny wpływ na jego cenę (p \< 0,001). Oznacza to, że różnice cen pomiędzy analizowanymi markami nie są przypadkowe.
+
+Jednocześnie wielkość efektu jest relatywnie niewielka (η²ₚ = 0,10), co wskazuje, że marka wyjaśnia jedynie około 10% zróżnicowania cen w badanym zbiorze danych. Dodatkowo, przedział ufności dla miary efektu jest szeroki i obejmuje zakres od 0,09 do 1,00, co sugeruje umiarkowaną precyzję oszacowania.
+
+Wyniki te wskazują, że choć marka premium istotnie różnicuje ceny samochodów w sensie statystycznym, jej rzeczywisty wpływ praktyczny jest ograniczony, a ceny w dużej mierze determinowane są również przez inne czynniki, takie jak rok produkcji, przebieg czy parametry techniczne pojazdu.
 
 ```{r}
 test_anova_fuel_mileage_year_price <- aov(price ~ fuel + mileage + year, data = dane_imp)
@@ -417,10 +462,14 @@ wizualizacja_anova <- ggcoefstats(test_anova_fuel_mileage_year_price,
              title = "Wpływ rodzaju paliwa, przebiegu i roku produkcji na cenę samochodu",
              xlab = "Czynniki",
              ylab = "Współczynniki")
-interactionplot(wizualizacja_anova)
+wizualizacja_anova
 ```
 
-Wnioski
+Zastosowano jednoczynnikową analizę wariancji (ANOVA) w celu oceny wpływu rodzaju paliwa, przebiegu oraz roku produkcji na cenę samochodu. Wyniki wskazują, że wszystkie trzy czynniki mają statystycznie istotny wpływ na cenę pojazdu (p \< 0,001).
+
+Analiza wielkości efektu pokazuje jednak istotne różnice w sile oddziaływania poszczególnych zmiennych. Najsilniejszy wpływ na cenę ma przebieg pojazdu (η²ₚ = 0,33), co oznacza, że wyjaśnia on około 33% zróżnicowania cen w badanym zbiorze. Rodzaj paliwa (η²ₚ = 0,09) oraz rok produkcji (η²ₚ = 0,08) wykazują wpływ istotny statystycznie, lecz o wyraźnie mniejszej sile praktycznej.
+
+Otrzymane wyniki sugerują, że choć wszystkie analizowane czynniki są ważne z punktu widzenia statystyki, to przebieg pojazdu odgrywa kluczową rolę w kształtowaniu ceny samochodu, podczas gdy rodzaj paliwa i rok produkcji mają znaczenie uzupełniające.
 
 ```{r}
 rejestracje <- dane_imp %>%
@@ -429,7 +478,7 @@ rejestracje <- dane_imp %>%
   summarise(liczba_aut_rok = n(), .groups = "drop") %>%
   mutate(okres = ifelse(year == 2021, "2021", "Pozostałe lata"))
 
-ggbetweenstats(
+wyniki_rejestracje <- ggbetweenstats(
   data = rejestracje,
   x = okres,
   y = liczba_aut_rok,
@@ -438,9 +487,14 @@ ggbetweenstats(
   xlab = "",
   ylab = "Liczba zarejestrowanych samochodów"
 )
+wyniki_rejestracje
 ```
 
-Wnioski
+W poprzednich analizach zaobserwowano wyraźny wzrost liczby rejestracji samochodów w 2021 roku. W celu sprawdzenia, czy różnica ta jest statystycznie istotna w porównaniu do pozostałych lat, zastosowano nieparametryczny test Manna–Whitneya, odpowiedni ze względu na brak normalności rozkładów.
+
+Wyniki testu wskazują na istotną statystycznie różnicę w liczbie rejestracji samochodów pomiędzy rokiem 2021 a pozostałymi latami (p \< 0,001). Oznacza to, że obserwowany wzrost liczby rejestracji w 2021 roku nie ma charakteru losowego i stanowi istotne odchylenie od wcześniejszych trendów.
+
+Dodatkowo wielkość efektu na poziomie 0,50 wskazuje na umiarkowanie silny efekt praktyczny, co potwierdza, że różnica ma również znaczenie merytoryczne, a nie wyłącznie statystyczne. Wyniki te potwierdzają wyjątkowy charakter roku 2021 na rynku rejestracji samochodów.
 
 # 5 Wnioski
 
