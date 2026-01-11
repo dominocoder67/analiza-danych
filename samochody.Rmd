@@ -93,12 +93,12 @@ Następnie oszacowano udział kompletnych obserwacji w zbiorze danych. Pozwolił
 
 ```{r, echo=FALSE}
 procent <- naniar::prop_complete_var(dane) * 100
-procent
+# procent
 ```
 
 W danych znajduje się `r round(procent)` % kompletnych wartości.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, results='hide'}
 VIM::aggr(
   dane,
   col = c("navyblue", "red"),
@@ -115,7 +115,7 @@ Aby dokładniej przeanalizować strukturę braków danych, zastosowano graficzn�
 
 ### Imputacje danych
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, results='hide'}
 dane_imp <- VIM::hotdeck(dane)
 
 VIM::aggr(
@@ -142,7 +142,7 @@ Zdefiniowano podstawowe reguły walidacyjne obejmujące nieujemne wartości ceny
 
 ```{r, echo=FALSE}
 data(dane_imp)
-head(dane_imp[3:7],3)
+# head(dane_imp[3:7],3)
 # dodajmy ID
 dane_imp$rec_id <- sprintf("%03d",1:nrow(dane_imp))
 
@@ -154,7 +154,7 @@ rules <- validator(
 )
 
 cf <- confront(dane_imp, rules, key="rec_id")
-summary(cf)
+# summary(cf)
 barplot(cf, main="Samochody - Walidacja danych")
 #as.data.frame(cf) %>% head()
 ```
@@ -261,7 +261,7 @@ Analiza statystyczna dla wpływu roku, przebiegu i mocy silnika na cene
 
 ```{r}
 LMP <- lm(price ~ year + mileage + vol_engine, data = dane_imp)
-summary(LMP)
+# summary(LMP)
 model_liniowy_tabelka <- modelsummary(LMP)
 model_liniowy_tabelka
 ```
@@ -286,7 +286,7 @@ macierz_korelacji <- corrplot::corrplot(
   type = "full",
   diag = TRUE
 )
-macierz_korelacji
+# macierz_korelacji
 ```
 
 Macierz korelacji przedstawia siłę i kierunek zależności liniowych pomiędzy analizowanymi zmiennymi. Najwyższą dodatnią korelację obserwujemy między ceną a rokiem produkcji (r = 0,60), co oznacza, że nowsze samochody są przeciętnie droższe. Z kolei najsilniejsza ujemna korelacja występuje między rokiem produkcji a przebiegiem (r = −0,73), co wskazuje, że starsze pojazdy mają zwykle większy przebieg, co jest zgodne z intuicją.
